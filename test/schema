@@ -1,0 +1,445 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.2.2
+-- Dumped by pg_dump version 9.2.2
+-- Started on 2013-06-06 15:06:49 CDT
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+DROP DATABASE leaderboard;
+--
+-- TOC entry 2239 (class 1262 OID 32792)
+-- Name: leaderboard; Type: DATABASE; Schema: -; Owner: mbrowning
+--
+
+CREATE DATABASE leaderboard WITH TEMPLATE = template0 ENCODING = 'UTF8' LC_COLLATE = 'en_US' LC_CTYPE = 'en_US';
+
+
+ALTER DATABASE leaderboard OWNER TO mbrowning;
+
+\connect leaderboard
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- TOC entry 6 (class 2615 OID 2200)
+-- Name: public; Type: SCHEMA; Schema: -; Owner: mbrowning
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO mbrowning;
+
+--
+-- TOC entry 2240 (class 0 OID 0)
+-- Dependencies: 6
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: mbrowning
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
+--
+-- TOC entry 176 (class 3079 OID 11995)
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 2242 (class 0 OID 0)
+-- Dependencies: 176
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 168 (class 1259 OID 32793)
+-- Name: efforts; Type: TABLE; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+CREATE TABLE efforts (
+    start_time timestamp without time zone NOT NULL,
+    duration interval NOT NULL,
+    "user" integer NOT NULL,
+    location integer NOT NULL
+);
+
+
+ALTER TABLE public.efforts OWNER TO mbrowning;
+
+--
+-- TOC entry 169 (class 1259 OID 32796)
+-- Name: locations; Type: TABLE; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+CREATE TABLE locations (
+    id integer NOT NULL,
+    latitude double precision NOT NULL,
+    longitude double precision NOT NULL
+);
+
+
+ALTER TABLE public.locations OWNER TO mbrowning;
+
+--
+-- TOC entry 170 (class 1259 OID 32799)
+-- Name: locations_id_seq; Type: SEQUENCE; Schema: public; Owner: mbrowning
+--
+
+CREATE SEQUENCE locations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.locations_id_seq OWNER TO mbrowning;
+
+--
+-- TOC entry 2243 (class 0 OID 0)
+-- Dependencies: 170
+-- Name: locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mbrowning
+--
+
+ALTER SEQUENCE locations_id_seq OWNED BY locations.id;
+
+
+--
+-- TOC entry 171 (class 1259 OID 32801)
+-- Name: teams; Type: TABLE; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+CREATE TABLE teams (
+    id integer NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE public.teams OWNER TO mbrowning;
+
+--
+-- TOC entry 172 (class 1259 OID 32807)
+-- Name: teams_id_seq; Type: SEQUENCE; Schema: public; Owner: mbrowning
+--
+
+CREATE SEQUENCE teams_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.teams_id_seq OWNER TO mbrowning;
+
+--
+-- TOC entry 2244 (class 0 OID 0)
+-- Dependencies: 172
+-- Name: teams_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mbrowning
+--
+
+ALTER SEQUENCE teams_id_seq OWNED BY teams.id;
+
+
+--
+-- TOC entry 173 (class 1259 OID 32809)
+-- Name: users; Type: TABLE; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+CREATE TABLE users (
+    id integer NOT NULL,
+    email text NOT NULL,
+    first_name text NOT NULL,
+    last_name text NOT NULL,
+    username text
+);
+
+
+ALTER TABLE public.users OWNER TO mbrowning;
+
+--
+-- TOC entry 174 (class 1259 OID 32815)
+-- Name: users2teams; Type: TABLE; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+CREATE TABLE users2teams (
+    "user" integer NOT NULL,
+    team integer NOT NULL
+);
+
+
+ALTER TABLE public.users2teams OWNER TO mbrowning;
+
+--
+-- TOC entry 175 (class 1259 OID 32818)
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: mbrowning
+--
+
+CREATE SEQUENCE users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO mbrowning;
+
+--
+-- TOC entry 2245 (class 0 OID 0)
+-- Dependencies: 175
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: mbrowning
+--
+
+ALTER SEQUENCE users_id_seq OWNED BY users.id;
+
+
+--
+-- TOC entry 2204 (class 2604 OID 32820)
+-- Name: id; Type: DEFAULT; Schema: public; Owner: mbrowning
+--
+
+ALTER TABLE ONLY locations ALTER COLUMN id SET DEFAULT nextval('locations_id_seq'::regclass);
+
+
+--
+-- TOC entry 2205 (class 2604 OID 32821)
+-- Name: id; Type: DEFAULT; Schema: public; Owner: mbrowning
+--
+
+ALTER TABLE ONLY teams ALTER COLUMN id SET DEFAULT nextval('teams_id_seq'::regclass);
+
+
+--
+-- TOC entry 2206 (class 2604 OID 32822)
+-- Name: id; Type: DEFAULT; Schema: public; Owner: mbrowning
+--
+
+ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
+-- TOC entry 2227 (class 0 OID 32793)
+-- Dependencies: 168
+-- Data for Name: efforts; Type: TABLE DATA; Schema: public; Owner: mbrowning
+--
+
+COPY efforts (start_time, duration, "user", location) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2228 (class 0 OID 32796)
+-- Dependencies: 169
+-- Data for Name: locations; Type: TABLE DATA; Schema: public; Owner: mbrowning
+--
+
+COPY locations (id, latitude, longitude) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2246 (class 0 OID 0)
+-- Dependencies: 170
+-- Name: locations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: mbrowning
+--
+
+SELECT pg_catalog.setval('locations_id_seq', 4, true);
+
+
+--
+-- TOC entry 2230 (class 0 OID 32801)
+-- Dependencies: 171
+-- Data for Name: teams; Type: TABLE DATA; Schema: public; Owner: mbrowning
+--
+
+COPY teams (id, name) FROM stdin;
+1	Red Team
+2	Blue Team
+3	Yellow Team
+\.
+
+
+--
+-- TOC entry 2247 (class 0 OID 0)
+-- Dependencies: 172
+-- Name: teams_id_seq; Type: SEQUENCE SET; Schema: public; Owner: mbrowning
+--
+
+SELECT pg_catalog.setval('teams_id_seq', 3, true);
+
+
+--
+-- TOC entry 2232 (class 0 OID 32809)
+-- Dependencies: 173
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: mbrowning
+--
+
+COPY users (id, email, first_name, last_name, username) FROM stdin;
+3	invitapriore@gmail.com	Michael	Browning	mbrowning
+4	ryanmcneely@me.com	Ryan	McNeely	rmcneely
+6	lblair@gmail.com	Lenard	Blair	lblair
+\.
+
+
+--
+-- TOC entry 2233 (class 0 OID 32815)
+-- Dependencies: 174
+-- Data for Name: users2teams; Type: TABLE DATA; Schema: public; Owner: mbrowning
+--
+
+COPY users2teams ("user", team) FROM stdin;
+3	1
+6	2
+4	3
+\.
+
+
+--
+-- TOC entry 2248 (class 0 OID 0)
+-- Dependencies: 175
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: mbrowning
+--
+
+SELECT pg_catalog.setval('users_id_seq', 10, true);
+
+
+--
+-- TOC entry 2208 (class 2606 OID 32840)
+-- Name: efforts_pkey; Type: CONSTRAINT; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+ALTER TABLE ONLY efforts
+    ADD CONSTRAINT efforts_pkey PRIMARY KEY (start_time, "user");
+
+
+--
+-- TOC entry 2210 (class 2606 OID 32838)
+-- Name: locations_latitude_longitude_key; Type: CONSTRAINT; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+ALTER TABLE ONLY locations
+    ADD CONSTRAINT locations_latitude_longitude_key UNIQUE (latitude, longitude);
+
+
+--
+-- TOC entry 2212 (class 2606 OID 32836)
+-- Name: locations_pkey; Type: CONSTRAINT; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+ALTER TABLE ONLY locations
+    ADD CONSTRAINT locations_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2214 (class 2606 OID 32834)
+-- Name: teams_name_key; Type: CONSTRAINT; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+ALTER TABLE ONLY teams
+    ADD CONSTRAINT teams_name_key UNIQUE (name);
+
+
+--
+-- TOC entry 2216 (class 2606 OID 32832)
+-- Name: teams_pkey; Type: CONSTRAINT; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+ALTER TABLE ONLY teams
+    ADD CONSTRAINT teams_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2224 (class 2606 OID 32830)
+-- Name: users2teams_pkey; Type: CONSTRAINT; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+ALTER TABLE ONLY users2teams
+    ADD CONSTRAINT users2teams_pkey PRIMARY KEY ("user", team);
+
+
+--
+-- TOC entry 2218 (class 2606 OID 32828)
+-- Name: users_email_key; Type: CONSTRAINT; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 2220 (class 2606 OID 32824)
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 2222 (class 2606 OID 32826)
+-- Name: users_username_key; Type: CONSTRAINT; Schema: public; Owner: mbrowning; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
+
+
+--
+-- TOC entry 2226 (class 2606 OID 32846)
+-- Name: efforts_location_fkey; Type: FK CONSTRAINT; Schema: public; Owner: mbrowning
+--
+
+ALTER TABLE ONLY efforts
+    ADD CONSTRAINT efforts_location_fkey FOREIGN KEY (location) REFERENCES locations(id);
+
+
+--
+-- TOC entry 2225 (class 2606 OID 32841)
+-- Name: efforts_user_fkey; Type: FK CONSTRAINT; Schema: public; Owner: mbrowning
+--
+
+ALTER TABLE ONLY efforts
+    ADD CONSTRAINT efforts_user_fkey FOREIGN KEY ("user") REFERENCES users(id);
+
+
+--
+-- TOC entry 2241 (class 0 OID 0)
+-- Dependencies: 6
+-- Name: public; Type: ACL; Schema: -; Owner: mbrowning
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM mbrowning;
+GRANT ALL ON SCHEMA public TO mbrowning;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+-- Completed on 2013-06-06 15:06:49 CDT
+
+--
+-- PostgreSQL database dump complete
+--
+
